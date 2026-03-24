@@ -1,120 +1,202 @@
-# NIH-Chest-X-rays-Multi-Label-Image-Classification-In-Pytorch
-Multi-Label Image Classification of the Chest X-Rays In Pytorch
+# MedVision
 
-# Requirements
-* torch >= 0.4    
-* torchvision >= 0.2.2
-* opencv-python    
-* numpy >= 1.7.3       
-* matplotlib       
-* tqdm    
+MedVision is a diploma project for chest X-ray analysis that combines a Flask web application with a PyTorch-based classification pipeline. The system lets a user upload an X-ray image, receive the top predicted findings, read short recommendations, browse a disease reference catalog, and review saved analysis history.
 
-# Dataset
-[NIH Chest X-ray Dataset](https://www.kaggle.com/nih-chest-xrays/data#Data_Entry_2017.csv) is used for  Multi-Label Disease Classification of of the Chest X-Rays.
-There are a total of 15 classes (14 diseases, and one for 'No findings')
-Images can be classified as "No findings" or one or more disease classes:
-* Atelectasis
-* Consolidation
-* Infiltration
-* Pneumothorax
-* Edema
-* Emphysema
-* Fibrosis
-* Effusion
-* Pneumonia
-* Pleural_thickening
-* Cardiomegaly
-* Nodule Mass
-* Hernia
+The project supports two inference modes:
 
-There are 112,120 X-ray images of size 1024x1024 pixels, in which 86,524 images are for training and 25,596 are for testing.
+- `demo` mode for interface testing without a trained checkpoint
+- `real` mode for inference with a saved PyTorch model checkpoint
 
-# Sample X-Ray Images
-<div class="row">
-  <div class="column">
-    <img src='/sample_xrays/Atelectasis.png' width='250' alt='Atelectasis' hspace='15'>
-  </div>
-  <div class="column">
-    <img src='/sample_xrays/Cardiomegaly_Edema_Effusion.png' width='250' alt='Cardiomegaly | Edema | Effusion' hspace='15'>
-  </div>
-  <div class="column">
-    <img src='/sample_xrays/No Finding.png' width='250' alt='No Finding' hspace='15'>
-  </div>
-</div>
+## Features
 
-# Model 
-Pretrained Resnet50 model is used for Transfer Learning on this new image dataset.
+- Upload chest X-ray images in `PNG`, `JPG`, or `JPEG`
+- Show top-3 predicted findings with confidence values
+- Store analysis history in SQLite
+- Provide disease descriptions and short recommendations
+- Support Kazakh and Russian interface languages
+- Run either with a demo predictor or a real model checkpoint
 
-# Loss Function
-There is a choice of loss function
-* Focal Loss (default)
-* Binary Cross Entropy Loss or BCE Loss
+## Project Structure
 
-# Training
-* ### From Scratch 
-    Following are the layers which are set to trainable-
-    * layer2
-    * layer3
-    * layer4
-    * fc
-
-    Terminal Code: 
-    ```
-    python main.py
-    ```
-
-* ### Resuming From a Saved Checkpoint
-    A Saved Checkpoint needs to be loaded which is nothing but a dictionary containing the 
-    * epochs (number of epochs the model has been trained till that time)
-    * model (architecture and the learnt weights of the model)
-    * lr_scheduler_state_dict (state_dict of the lr_scheduler)
-    * losses_dict (a dictionary containing the following loses)
-
-      * mean train epoch losses for all the epochs
-      * mean val epoch losses for all the epochs
-      * batch train loss for all the training batches
-      * batch train loss for all the val batches
- 
-Different layers of the model are freezed/unfreezed in different stages, defined at the end of *this README.md file, to fit the model well on the data. The 'stage' parameter can be passed from the terminal using the argument --stage STAGE
- 
-Terminal Code: 
+```text
+medvision/
+  blueprints/        Flask routes for pages and analysis flow
+  content/           Disease catalog and localized content
+  services/          Prediction logic, recommendations, content loaders
+  static/            CSS and JavaScript assets
+  templates/         Jinja2 HTML templates
+tests/               Basic application tests
+sample_xrays/        Example chest X-ray images
+run.py               Flask app entry point
+main.py              Training / evaluation entry point for the ML pipeline
+trainer.py           Model training logic
+config.py            Training configuration
+requirements.txt     Python dependencies
 ```
+
+## Tech Stack
+
+- Python
+- Flask
+- Flask-SQLAlchemy
+- PyTorch
+- OpenCV
+- NumPy
+- Pandas
+- Matplotlib
+
+## Installation
+
+1. Create and activate a virtual environment.
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+2. Install dependencies.
+
+```powershell
+pip install -r requirements.txt
+```
+
+## Run The Web App
+
+Start the application with:
+
+```powershell
+python run.py
+```
+
+After launch, open the local address shown by Flask in your browser, usually:
+
+```text
+http://127.0.0.1:5000
+```
+
+## How The Web App Works
+
+The web application includes these main sections:
+
+- `/` - main landing page
+- `/analyze` - upload and analyze an X-ray image
+- `/diseases` - disease catalog and system overview
+- `/history` - saved analysis history
+
+Uploaded files are stored in `instance/uploads`, and analysis records are saved in `instance/app.db`.
+
+## Inference Modes
+
+### Demo Mode
+
+If no real checkpoint is found, the application uses demo mode automatically. In this mode, predictions are generated deterministically from the uploaded image so the interface can be tested safely.
+
+### Real Model Mode
+
+If the checkpoint file exists, the application can run real inference with PyTorch.
+
+Default checkpoint path:
+
+```text
+models/stage1_1e-05_03.pth
+```
+
+You can also set the mode manually before launch:
+
+```powershell
+$env:PREDICTOR_MODE="real"
+$env:MODEL_CHECKPOINT="C:\path\to\stage1_1e-05_03.pth"
+python run.py
+```
+
+To force demo mode:
+
+```powershell
+$env:PREDICTOR_MODE="demo"
+python run.py
+```
+
+## Machine Learning Pipeline
+
+The repository also contains the original model training and testing pipeline for multi-label chest X-ray classification.
+
+Main files:
+
+- `main.py`
+- `trainer.py`
+- `config.py`
+- `datasets.py`
+- `losses.py`
+
+Run training:
+
+```powershell
+python main.py
+```
+
+Resume from checkpoint:
+
+```powershell
 python main.py --resume --ckpt checkpoint_file.pth --stage 2
 ```
 
-Training the model will create a **models** directory and will save the checkpoints in there.
+Run testing:
 
-# Testing
-A Saved Checkpoint needs to be loaded using the **--ckpt** argument and **--test** argument needs to be passed for activating the Test Mode
-
-Terminal Code: 
-```
+```powershell
 python main.py --test --ckpt checkpoint_file.pth
 ```
 
-# Result 
-The model achieved the average **ROC AUC Score** of **0.73241** on all classes(excluding "No findings" class) after training in the following stages-
+## Dataset
 
-#### STAGE 1 
-* Loss Function: FocalLoss
-* lr: 1e-5
-* Training Layers: layer2, layer3, layer4, fc 
-* Epochs: 2
+The training pipeline is based on the NIH Chest X-ray dataset:
 
-#### STAGE 2 
-* Loss Function: FocalLoss
-* lr: 3e-4
-* Training Layers: layer3, layer4, fc 
-* Epochs: 1
+[NIH Chest X-ray Dataset](https://www.kaggle.com/nih-chest-xrays/data#Data_Entry_2017.csv)
 
-#### STAGE 3 
-* Loss Function: FocalLoss
-* lr: 1e-3
-* Training Layers: layer4, fc 
-* Epochs: 3
+Predicted labels include:
 
-#### STAGE 4 
-* Loss Function: FocalLoss
-* lr: 1e-3
-* Training Layers: fc 
-* Epochs: 2
+- Atelectasis
+- Cardiomegaly
+- Consolidation
+- Edema
+- Effusion
+- Emphysema
+- Fibrosis
+- Hernia
+- Infiltration
+- Mass
+- Nodule
+- No Finding
+- Pleural Thickening
+- Pneumonia
+- Pneumothorax
+
+Note: large folders such as `data/`, `models/`, `pickles/`, and virtual environment files are excluded from Git to keep the repository lightweight.
+
+## Testing
+
+Run the application tests with:
+
+```powershell
+python -m unittest tests.test_app
+```
+
+The current tests cover:
+
+- rendering of core pages
+- language switching
+- upload flow and history creation
+- validation of unsupported file formats
+
+## Sample Images
+
+Example images for quick interface checks are available in `sample_xrays/`.
+
+## Notes
+
+- The app is intended as an educational and diploma project, not as a medical diagnostic device.
+- Predictions and recommendations must not replace a doctor's conclusion.
+- If ML dependencies or checkpoint assets are missing, use demo mode for presentation and interface testing.
+
+## Author
+
+Diploma project repository for X-ray disease classification and MedVision web interface.
