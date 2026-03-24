@@ -7,6 +7,7 @@ __pycache__/
 instance/
 
 # Generated training artifacts and large assets
+ОТЧЕТ/
 data/
 models/
 pickles/
