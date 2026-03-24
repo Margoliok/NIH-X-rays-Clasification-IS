@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="{{ current_lang }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ ui.site.brand }}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="{{ url_for('main.index') }}">
+          <span class="brand-mark">MV</span>
+          <span>
+            <strong>{{ ui.site.brand }}</strong>
+            <small>{{ ui.site.tagline }}</small>
+          </span>
+        </a>
+        <nav class="site-nav">
+          <a href="{{ url_for('main.index') }}">{{ ui.nav.home }}</a>
+          <a href="{{ url_for('analysis.analyze') }}">{{ ui.nav.analyze }}</a>
+          <a href="{{ url_for('diseases.index') }}">{{ ui.nav.diseases }}</a>
+          <a href="{{ url_for('history.index') }}">{{ ui.nav.history }}</a>
+        </nav>
+        <div class="header-actions">
+          <span class="tag tag-soft">{{ ui.badges.history }}</span>
+          <div class="lang-switch">
+            {% for lang in supported_languages %}
+              <a class="{% if lang == current_lang %}active{% endif %}" href="{{ url_for('main.set_language', lang=lang, next=current_path) }}">{{ ui.lang[lang] }}</a>
+            {% endfor %}
+          </div>
+        </div>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <section class="flash-stack container">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </section>
+        {% endif %}
+      {% endwith %}
+
+      <main>
+        {% block content %}{% endblock %}
+      </main>
+
+      <footer class="site-footer">
+        <div class="container footer-inner">
+          <p>{{ ui.site.footer }}</p>
+          <p>Flask + SQLAlchemy + Demo Predictor</p>
+        </div>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/site.js') }}"></script>
+  </body>
+</html>

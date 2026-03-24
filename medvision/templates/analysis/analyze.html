@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ui.analysis.title }} | {{ ui.site.brand }}{% endblock %}
+
+{% block content %}
+  <section class="section">
+    <div class="container">
+      <div class="page-heading reveal">
+        <span class="tag">{{ mode_badge }}</span>
+        <h1>{{ ui.analysis.title }}</h1>
+        <p>{{ ui.analysis.subtitle }}</p>
+      </div>
+      <div class="split-grid analyze-layout">
+        <form class="upload-card reveal" method="post" enctype="multipart/form-data">
+          <label class="dropzone" data-dropzone>
+            <input type="file" name="xray_image" accept=".png,.jpg,.jpeg" data-file-input>
+            <span class="dropzone-title">{{ ui.analysis.dropzone_title }}</span>
+            <span class="dropzone-hint">{{ ui.analysis.dropzone_hint }}</span>
+          </label>
+          <div class="preview-card">
+            <h3>{{ ui.analysis.preview_title }}</h3>
+            <div class="preview-frame" data-preview-frame>
+              <span data-preview-placeholder>{{ ui.analysis.preview_title }}</span>
+              <img data-preview-image alt="Preview">
+            </div>
+          </div>
+          <p class="muted">{{ ui.analysis.formats }}</p>
+          <button class="button button-primary" type="submit">{{ ui.analysis.upload_button }}</button>
+        </form>
+
+        <aside class="info-card reveal">
+          <span class="tag tag-soft">{{ mode_badge }}</span>
+          <p>{{ mode_notice }}</p>
+          <h2>{{ ui.analysis.workflow_title }}</h2>
+          <ul class="bullet-list">
+            {% for item in ui.analysis.workflow_items %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+{% endblock %}

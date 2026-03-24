@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ui.diseases.title }} | {{ ui.site.brand }}{% endblock %}
+
+{% block content %}
+  <section class="section">
+    <div class="container">
+      <div class="page-heading reveal">
+        <h1>{{ ui.diseases.title }}</h1>
+        <p>{{ ui.diseases.subtitle }}</p>
+      </div>
+
+      <article class="info-card reveal article-card">
+        <h2>{{ overview.title }}</h2>
+        <p>{{ overview.body }}</p>
+        <ul class="bullet-list">
+          {% for point in ui.diseases.overview_points %}
+            <li>{{ point }}</li>
+          {% endfor %}
+        </ul>
+      </article>
+
+      <form class="search-row reveal" method="get">
+        <input type="search" name="q" value="{{ query }}" placeholder="{{ ui.diseases.search }}" data-disease-search>
+        <button class="button button-secondary" type="submit">{{ ui.diseases.open_card }}</button>
+      </form>
+
+      <div class="card-grid four-up" data-disease-grid>
+        {% for disease in diseases %}
+          <article class="disease-card reveal" data-disease-card data-disease-title="{{ disease.title|lower }} {{ disease.model_label|lower }}">
+            <span class="card-pill">{{ disease.model_label }}</span>
+            <h3>{{ disease.title }}</h3>
+            <p>{{ disease.short_description }}</p>
+            <a class="text-link" href="{{ url_for('diseases.detail', slug=disease.slug) }}">{{ ui.diseases.open_card }}</a>
+          </article>
+        {% endfor %}
+      </div>
+
+      <p class="empty-search" data-empty-search hidden>{{ ui.diseases.no_results }}</p>
+    </div>
+  </section>
+{% endblock %}

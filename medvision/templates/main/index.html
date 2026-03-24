@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ui.site.brand }}{% endblock %}
+
+{% block content %}
+  <section class="hero-section">
+    <div class="container hero-grid">
+      <div class="hero-copy reveal">
+        <span class="eyebrow">{{ ui.site.brand }}</span>
+        <h1>{{ ui.landing.hero_title }}</h1>
+        <p class="lead">{{ ui.landing.hero_text }}</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="{{ url_for('analysis.analyze') }}">{{ ui.landing.cta_primary }}</a>
+          <a class="button button-secondary" href="{{ url_for('diseases.index') }}">{{ ui.landing.cta_secondary }}</a>
+        </div>
+      </div>
+      <div class="hero-panel reveal">
+        <div class="floating-card floating-card-primary">
+          <span class="card-label">{{ ui.badges.demo }}</span>
+          <h2>{{ ui.landing.panel_title }}</h2>
+          <p>{{ ui.landing.panel_text }}</p>
+        </div>
+        <div class="stats-grid">
+          {% for stat in ui.landing.stats %}
+            <article class="stat-card">
+              <strong>{{ stat.value }}</strong>
+              <span>{{ stat.label }}</span>
+            </article>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container split-grid">
+      <article class="info-card reveal">
+        <h2>{{ ui.landing.how_title }}</h2>
+        <ol class="step-list">
+          {% for step in ui.landing.how_steps %}
+            <li>{{ step }}</li>
+          {% endfor %}
+        </ol>
+      </article>
+      <article class="info-card reveal">
+        <h2>{{ overview.title }}</h2>
+        <p>{{ overview.body }}</p>
+        <ul class="bullet-list">
+          {% for step in overview.steps %}
+            <li>{{ step }}</li>
+          {% endfor %}
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2>{{ ui.landing.value_title }}</h2>
+      </div>
+      <div class="card-grid three-up">
+        {% for card in ui.landing.value_cards %}
+          <article class="feature-card reveal">
+            <h3>{{ card.title }}</h3>
+            <p>{{ card.text }}</p>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2>{{ ui.landing.featured_title }}</h2>
+      </div>
+      <div class="card-grid four-up">
+        {% for disease in featured_diseases %}
+          <article class="disease-card reveal">
+            <span class="card-pill">{{ disease.model_label }}</span>
+            <h3>{{ disease.title }}</h3>
+            <p>{{ disease.short_description }}</p>
+            <a class="text-link" href="{{ url_for('diseases.detail', slug=disease.slug) }}">{{ ui.diseases.open_card }}</a>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="section disclaimer-strip">
+    <div class="container reveal">
+      <h2>{{ ui.landing.disclaimer_title }}</h2>
+      <p>{{ ui.landing.disclaimer_text }}</p>
+    </div>
+  </section>
+{% endblock %}

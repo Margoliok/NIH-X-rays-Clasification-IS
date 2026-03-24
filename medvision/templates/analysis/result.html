@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ui.analysis.result_title }} | {{ ui.site.brand }}{% endblock %}
+
+{% block content %}
+  <section class="section">
+    <div class="container">
+      <div class="page-heading reveal">
+        <span class="tag">{{ ui.badges.demo if record.model_mode == 'demo' else record.model_mode }}</span>
+        <h1>{{ ui.analysis.result_title }}</h1>
+        <p>{{ ui.misc.recorded_in }}: {{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+      </div>
+
+      <div class="result-layout">
+        <article class="result-card reveal">
+          <img class="result-image" src="{{ url_for('analysis.uploaded_file', filename=record.image_filename) }}" alt="{{ ui.misc.uploaded_image }}">
+          <div class="result-summary">
+            <div class="summary-head">
+              <span class="tag {% if record.is_healthy %}tag-success{% else %}tag-alert{% endif %}">
+                {{ ui.badges.healthy if record.is_healthy else ui.badges.attention }}
+              </span>
+              <h2>{{ ui.analysis.primary }}: {{ disease.title if disease else record.primary_label }}</h2>
+            </div>
+            <p>{{ confidence_note }}</p>
+          </div>
+        </article>
+
+        <div class="stack">
+          <article class="info-card reveal">
+            <h2>{{ ui.analysis.top3 }}</h2>
+            <div class="prediction-list">
+              {% for item in record.top_predictions %}
+                <div class="prediction-row">
+                  <div class="prediction-meta">
+                    <strong>{{ item.label }}</strong>
+                    <span>{{ item.percent }}%</span>
+                  </div>
+                  <div class="prediction-bar">
+                    <span style="width: {{ item.percent }}%"></span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </article>
+
+          <article class="info-card reveal">
+            <h2>{{ ui.analysis.advice }}</h2>
+            <p>{{ advice_text }}</p>
+            <div class="action-row">
+              {% if disease %}
+                <a class="button button-secondary" href="{{ url_for('diseases.detail', slug=disease.slug) }}">{{ ui.analysis.related }}</a>
+              {% endif %}
+              <a class="button button-ghost" href="{{ url_for('history.index') }}">{{ ui.analysis.history }}</a>
+              <a class="button button-primary" href="{{ url_for('analysis.analyze') }}">{{ ui.analysis.new_analysis }}</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

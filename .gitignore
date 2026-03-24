@@ -1,0 +1,17 @@
+.idea/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Local runtime data
+instance/
+
+# Generated training artifacts and large assets
+data/
+models/
+pickles/
+GT_and_probs
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
