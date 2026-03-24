@@ -19,19 +19,43 @@ The project supports two inference modes:
 ## Project Structure
 
 ```text
+.
++-- medvision/
+|   +-- blueprints/       Flask routes
+|   +-- content/          disease descriptions and localized UI data
+|   +-- services/         prediction, recommendations, content loading
+|   +-- static/           CSS and JavaScript
+|   +-- templates/        Jinja2 templates
+|   +-- __init__.py       app factory
+|   +-- config.py         Flask config
+|   +-- extensions.py     SQLAlchemy init
+|   \-- models.py         database models
++-- tests/                automated tests for the web app
++-- sample_xrays/         example X-ray images for demo and screenshots
++-- data/                 dataset files for training and evaluation
++-- models/               saved checkpoints and training plots
++-- pickles/              generated metadata files for classes and splits
++-- instance/             SQLite DB and uploaded files at runtime
++-- ОТЧЕТ/                diploma report materials
++-- run.py                starts the Flask web application
++-- main.py               starts model training / resume / testing
++-- trainer.py            training loop and checkpoint saving
++-- datasets.py           dataset preparation classes
++-- config.py             transform and ML pipeline settings
++-- losses.py             loss functions
++-- requirements.txt      Python dependencies
+\-- README.md             project documentation
+```
+
+Main working folders:
+
+```text
 medvision/
-  blueprints/        Flask routes for pages and analysis flow
-  content/           Disease catalog and localized content
-  services/          Prediction logic, recommendations, content loaders
+  blueprints/        pages and analysis flow
+  content/           disease catalog and localized content
+  services/          prediction logic and recommendations
   static/            CSS and JavaScript assets
-  templates/         Jinja2 HTML templates
-tests/               Basic application tests
-sample_xrays/        Example chest X-ray images
-run.py               Flask app entry point
-main.py              Training / evaluation entry point for the ML pipeline
-trainer.py           Model training logic
-config.py            Training configuration
-requirements.txt     Python dependencies
+  templates/         HTML templates
 ```
 
 ## Tech Stack
@@ -152,6 +176,77 @@ The training pipeline is based on the NIH Chest X-ray dataset:
 
 [NIH Chest X-ray Dataset](https://www.kaggle.com/nih-chest-xrays/data#Data_Entry_2017.csv)
 
+## Dataset Preparation
+
+The training code expects the NIH dataset inside the local `data/` folder.
+
+Expected layout:
+
+```text
+data/
+\-- NIH Chest X-rays/
+    +-- Data_Entry_2017.csv
+    +-- train_val_list.txt
+    +-- test_list.txt
+    +-- images_001/
+    |   \-- images/
+    +-- images_002/
+    |   \-- images/
+    +-- images_003/
+    |   \-- images/
+    \-- ...
+```
+
+Important details:
+
+- `Data_Entry_2017.csv` is required for labels and metadata
+- `train_val_list.txt` and `test_list.txt` are required for the split logic in `datasets.py`
+- image files are discovered by the pattern `images*/*/*.png`
+- by default `main.py` uses `--data_path "NIH Chest X-rays"`, which means the full path becomes `data/NIH Chest X-rays/`
+
+### How To Download The Dataset
+
+1. Open the NIH Chest X-ray dataset page on Kaggle:
+
+[NIH Chest X-ray Dataset](https://www.kaggle.com/nih-chest-xrays/data#Data_Entry_2017.csv)
+
+2. Download:
+
+- the image archive folders
+- `Data_Entry_2017.csv`
+- `train_val_list.txt`
+- `test_list.txt`
+
+3. Unpack everything into:
+
+```text
+data/NIH Chest X-rays/
+```
+
+4. After extraction, make sure the following file exists:
+
+```text
+data/NIH Chest X-rays/Data_Entry_2017.csv
+```
+
+5. Then run training:
+
+```powershell
+python main.py
+```
+
+If you want to use another folder name, you can pass it manually:
+
+```powershell
+python main.py --data_path "My Dataset Folder"
+```
+
+In that case the code will look for:
+
+```text
+data/My Dataset Folder/
+```
+
 Predicted labels include:
 
 - Atelectasis
@@ -169,6 +264,14 @@ Predicted labels include:
 - Pleural Thickening
 - Pneumonia
 - Pneumothorax
+
+Generated ML artifacts:
+
+- `pickles/train_val_df.pickle` - cached train/validation split dataframe
+- `pickles/test_df.pickle` - cached test dataframe
+- `pickles/disease_classes.pickle` - saved class labels
+- `models/*.pth` - trained checkpoints
+- `models/losses_*.png` - training loss plots
 
 Note: large folders such as `data/`, `models/`, `pickles/`, and virtual environment files are excluded from Git to keep the repository lightweight.
 
